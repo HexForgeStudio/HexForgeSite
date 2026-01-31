@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HexForge — Game Development Studio</title>
+  <meta name="description" content="HexForge — команда по разработке игр и интерактивных решений: 2D/3D, VR/AR, симуляторы, ассеты." />
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --surface: rgba(255,255,255,.06);
+      --surface2: rgba(255,255,255,.09);
+      --border: rgba(255,255,255,.12);
+      --text: #eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --muted2: rgba(234,240,255,.56);
+      --accent: #6cf2c2;
+      --accent2: #7aa7ff;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(122,167,255,.18), transparent 60%),
+        radial-gradient(700px 420px at 85% 15%, rgba(108,242,194,.14), transparent 55%),
+        radial-gradient(800px 500px at 50% 110%, rgba(108,242,194,.10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(11,15,20,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .header-inner {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.35);
+    }
+    .brand small { display: block; font-weight: 600; color: var(--muted2); margin-top: -2px; letter-spacing: .4px; }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    nav a {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      transition: background .15s ease, color .15s ease;
+    }
+    nav a:hover { background: rgba(255,255,255,.06); color: var(--text); }
+
+    .right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lang {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+    }
+    .lang button {
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .lang button.active { background: rgba(255,255,255,.10); color: var(--text); }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(108,242,194,.35);
+      background: linear-gradient(135deg, rgba(108,242,194,.12), rgba(122,167,255,.08));
+      color: var(--text);
+      font-size: 13px;
+      transition: transform .15s ease, border-color .15s ease;
+      white-space: nowrap;
+    }
+    .cta:hover { transform: translateY(-1px); border-color: rgba(108,242,194,.55); }
+
+    /* Sections */
+    section { padding: 74px 0; }
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+    .section-title h2 {
+      font-size: 26px;
+      letter-spacing: .2px;
+    }
+    .section-title p { color: var(--muted2); max-width: 520px; font-size: 14px; }
+
+    /* Hero */
+    .hero { padding-top: 46px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .hero-card {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hero-main { padding: 34px 30px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+    .badge i {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(108,242,194,.18);
+    }
+    .hero h1 {
+      font-size: 44px;
+      line-height: 1.1;
+      letter-spacing: .2px;
+      max-width: 720px;
+    }
+    .hero p {
+      margin-top: 14px;
+      color: var(--muted);
+      max-width: 660px;
+      font-size: 15px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-size: 14px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); }
+    .btn.primary {
+      border-color: rgba(108,242,194,.35);
+      background: linear-gradient(135deg, rgba(108,242,194,.18), rgba(122,167,255,.10));
+    }
+
+    .hero-side {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+    }
+    .stat {
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+    }
+    .stat strong { font-size: 18px; }
+    .stat span { display: block; font-size: 12px; color: var(--muted2); margin-top: 2px; }
+
+    .side-card {
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .pill {
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Cards & grids */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .card:hover { transform: translateY(-2px); background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.16); }
+
+    .service { grid-column: span 4; min-height: 130px; }
+    .service h3 { font-size: 16px; margin-bottom: 6px; }
+    .service p { color: var(--muted2); font-size: 13px; }
+
+    .case { grid-column: span 12; display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+
+    /* Space between cases */
+    #cases .case { margin-bottom: 32px; }
+    #cases .case:last-child { margin-bottom: 0; }
+    .case h3 { font-size: 18px; margin-bottom: 8px; }
+    .case p { color: var(--muted); font-size: 14px; }
+
+    .case-meta {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .link:hover { border-color: rgba(108,242,194,.35); }
+
+    .process { grid-column: span 3; }
+    .process strong { display: block; font-size: 14px; margin-bottom: 6px; }
+    .process span { display: block; color: var(--muted2); font-size: 13px; }
+
+    .two { grid-column: span 6; }
+
+    /* Footer */
+    footer {
+      padding: 42px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: var(--muted2);
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; align-items: start; }
+    .footer-grid a { color: var(--text); }
+    .social { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .case { grid-template-columns: 1fr; }
+      .service { grid-column: span 6; }
+      .process { grid-column: span 6; }
+      .two { grid-column: span 12; }
+      nav { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .service { grid-column: span 12; }
+      .process { grid-column: span 12; }
+      .hero h1 { font-size: 34px; }
+      .header-inner { height: auto; padding: 14px 0; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="container header-inner">
+    <a class="brand" href="#top" aria-label="HexForge">
+      <span class="logo" aria-hidden="true">
+  <img src="hexforge-icon.png" alt="HexForge logo" style="width:34px;height:34px;display:block;" />
+</span>
+      <span>
+        HexForge
+        
+      </span>
+    </a>
+
+    <nav aria-label="Навигация">
+      <a href="#services" data-i18n="nav_services">Услуги</a>
+      <a href="#cases" data-i18n="nav_cases">Кейсы</a>
+      <a href="#process" data-i18n="nav_process">Процесс</a>
+      <a href="#team" data-i18n="nav_team">Команда</a>
+      
+      
+      
+      <a href="#contacts" data-i18n="nav_contacts">Контакты</a>
+    </nav>
+
+    <div class="right">
+      <div class="lang" role="tablist" aria-label="Language">
+        <button type="button" class="active" data-lang="ru">RU</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="uz">UZ</button>
+      </div>
+      <a class="cta" href="mailto:hexforgestuidogames@gmail.com" data-i18n="cta_header">Связаться</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-card hero-main">
+        <div class="badge"><i></i><span data-i18n="badge">Full-cycle, outsourcing, live ops</span></div>
+        <h1 data-i18n="hero_title">Создаём игры, VR/AR и симуляторы. Быстро. Качественно. Под NDA.</h1>
+        <p data-i18n="hero_sub">
+          HexForge — команда, которая берёт на себя полный цикл или подключается точечно: геймплей, системы, оптимизация,
+          сборки, поддержка, ассеты. Unity/Unreal, 2D/3D, мобильные и ПК.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#cases" data-i18n="btn_cases">Смотреть кейсы</a>
+          <a class="btn" href="https://t.me/inzavic" target="_blank" rel="noopener" data-i18n="btn_tg">Написать в Telegram</a>
+          <a class="btn" href="#contacts" data-i18n="btn_contact">Оставить заявку</a>
+        </div>
+      </div>
+
+      <div class="hero-card hero-side">
+        <div class="stats">
+          <div class="stat">
+            <strong>Unity / UE</strong>
+            <span data-i18n="stat_stack">Основной стек</span>
+          </div>
+          <div class="stat">
+            <strong>50K+</strong>
+            <span data-i18n="stat_downloads">скачиваний за месяц</span>
+          </div>
+        </div>
+        <div class="side-card">
+          <div class="pill" data-i18n="pill_1">Оптимизация, профайлинг, снижение нагрузки CPU/GPU</div>
+          <div class="pill" data-i18n="pill_2">Интеграции: аналитика, платежи, контент, live ops</div>
+          <div class="pill" data-i18n="pill_3">Готовы работать по NDA и под ваш пайплайн</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2 data-i18n="services_title">Услуги</h2>
+          <p data-i18n="services_sub">Подключаемся на весь цикл или закрываем конкретные задачи разработки и поддержки.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card service">
+          <h3 data-i18n="s1_title">GameDev 2D / 3D</h3>
+          <p data-i18n="s1_desc">Геймплей, системы, UI, сборки, релиз. Unity и Unreal Engine.</p>
+        </article>
+        <article class="card service">
+          <h3 data-i18n="s2_title">VR / AR</h3>
+          <p data-i18n="s2_desc">Интерактивные решения для обучения, презентаций и опыта пользователя.</p>
+        </article>
+        <article class="card service">
+          <h3 data-i18n="s3_title">Тренажёры и симуляторы</h3>
+          <p data-i18n="s3_desc">Сценарии, механики, аналитика прогресса, интеграции под бизнес-задачу.</p>
+        </article>
+        <article class="card service">
+          <h3 data-i18n="s4_title">Ассеты и asset packs</h3>
+          <p data-i18n="s4_desc">Создание и подготовка ассетов для магазинов и внутренних проектов.</p>
+        </article>
+        <article class="card service">
+          <h3 data-i18n="s5_title">Оптимизация и портирование</h3>
+          <p data-i18n="s5_desc">FPS, память, загрузки, профайлинг, стабильность на целевых устройствах.</p>
+        </article>
+        <article class="card service">
+          <h3 data-i18n="s6_title">Support & Live Ops</h3>
+          <p data-i18n="s6_desc">Поддержка после релиза, обновления, события, исправления, контент.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="cases">
+  <div class="container">
+    <div class="section-title">
+      <div>
+        <h2 data-i18n="cases_title">Кейсы</h2>
+        <p data-i18n="cases_sub">Добавили 2 кейса. Формат готов, чтобы быстро расширять портфолио.</p>
+      </div>
+    </div>
+
+    <!-- Bek va Lola -->
+    <article class="card case">
+      <div>
+        <h3>Bek va Lola</h3>
+        <p data-i18n="case1_desc">
+          Детская мобильная игра с узбекскими культурными ценностями. Полный цикл: разработка, оптимизация, публикация.
+        </p>
+        <div class="chips" style="margin-top: 12px;">
+          <span class="chip" data-i18n="chip_fullcycle">Full-cycle</span>
+          <span class="chip" data-i18n="chip_mobile">Mobile</span>
+          <span class="chip" data-i18n="chip_unity">Unity</span>
+          <span class="chip" data-i18n="chip_opt">Optimization</span>
+        </div>
+      </div>
+      <div class="case-meta">
+        <div class="card" style="padding: 14px; border-radius: 16px;">
+          <strong style="display:block; font-size: 14px;" data-i18n="case1_result_title">Результат</strong>
+          <span style="display:block; color: var(--muted); margin-top: 6px;" data-i18n="case1_result">50 000+ скачиваний за первый месяц</span>
+        </div>
+        <div class="links">
+          <a class="link" href="https://play.google.com/store/apps/details?id=com.unitedsoft.bekvalola&hl=uz" target="_blank" rel="noopener">Google Play</a>
+          <a class="link" href="https://apps.apple.com/us/app/bek-va-lola/id6751226357" target="_blank" rel="noopener">App Store</a>
+        </div>
+        <a class="btn" href="#contacts" data-i18n="case_btn">Хочу такой проект</a>
+      </div>
+    </article>
+
+    <!-- AR Museum -->
+    <article class="card case">
+      <div>
+        <h3>AR Museum</h3>
+        <p data-i18n="case2_desc">
+          AR-игра для локального музея: мы анимировали картины, сделали их «живыми» с помощью звука и визуальных эффектов, добавили интерактивный маршрут и элементы геймификации прямо в экспозиции.
+        </p>
+        <div class="chips" style="margin-top: 12px;">
+          <span class="chip" data-i18n="chip_fullcycle">Full-cycle</span>
+          <span class="chip" data-i18n="chip_ar">AR</span>
+          <span class="chip" data-i18n="chip_museum">Museum</span>
+          <span class="chip" data-i18n="chip_unity">Unity</span>
+        </div>
+      </div>
+      <div class="case-meta">
+        <div class="card" style="padding: 14px; border-radius: 16px;">
+          <strong style="display:block; font-size: 14px;" data-i18n="case2_result_title">Результат</strong>
+          <span style="display:block; color: var(--muted); margin-top: 6px;" data-i18n="case2_result">Продажи билетов выросли на 30% за счёт привлечения посетителей.</span>
+        </div>
+        <div class="links">
+          <span class="link" style="opacity:.8; cursor: default;" data-i18n="case2_links">Ссылки по запросу (NDA)</span>
+        </div>
+        <a class="btn" href="#contacts" data-i18n="case_btn">Хочу такой проект</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+  <section id="process">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2 data-i18n="process_title">Процесс работы</h2>
+          <p data-i18n="process_sub">Прозрачный процесс, чтобы вы понимали сроки, риски и контроль качества.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card process"><strong data-i18n="p1_t">1. Анализ</strong><span data-i18n="p1_d">Цели, платформа, ограничения, критерии успеха.</span></div>
+        <div class="card process"><strong data-i18n="p2_t">2. План</strong><span data-i18n="p2_d">Оценка, этапы, риски, план релизов.</span></div>
+        <div class="card process"><strong data-i18n="p3_t">3. Разработка</strong><span data-i18n="p3_d">Итерации, отчётность, демо-сборки.</span></div>
+        <div class="card process"><strong data-i18n="p4_t">4. QA</strong><span data-i18n="p4_d">Тесты, оптимизация, стабилизация.</span></div>
+        <div class="card process"><strong data-i18n="p5_t">5. Релиз</strong><span data-i18n="p5_d">Подготовка магазинов, публикация, поддержка.</span></div>
+        <div class="card process"><strong data-i18n="p6_t">6. Live Ops</strong><span data-i18n="p6_d">События, обновления, аналитика, улучшения.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2 data-i18n="team_title">Команда</h2>
+          <p data-i18n="team_sub">Небольшая, собранная команда. Быстро принимаем решения и держим качество.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card two">
+          <strong style="display:block; font-size: 16px; margin-bottom: 8px;" data-i18n="team_block1_t">Как мы работаем</strong>
+          <p style="color: var(--muted); font-size: 14px;" data-i18n="team_block1_d">
+            Работаем по NDA, легко встраиваемся в пайплайн заказчика и общаемся на языке продакшена: сроки, риски, качество.
+          </p>
+        </div>
+        <div class="card two">
+          <strong style="display:block; font-size: 16px; margin-bottom: 8px;" data-i18n="team_block2_t">Экспертиза</strong>
+          <p style="color: var(--muted); font-size: 14px;" data-i18n="team_block2_d">
+            Unity/UE, оптимизация, сборки, интеграции, поддержка и развитие проектов после релиза.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+  
+
+  
+
+  <section id="contacts">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2 data-i18n="contacts_title">Контакты</h2>
+          <p data-i18n="contacts_sub">Свяжитесь с нами удобным способом. Цены и сроки согласуем после вводных.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card two">
+          <strong style="display:block; font-size: 16px; margin-bottom: 8px;" data-i18n="contacts_fast">Быстрый контакт</strong>
+          <p style="color: var(--muted); font-size: 14px;">Telegram: <a href="https://t.me/inzavic" target="_blank" rel="noopener" style="color: var(--accent);">@inzavic</a></p>
+          <p style="color: var(--muted); font-size: 14px;">Email: <a href="mailto:hexforgestuidogames@gmail.com" style="color: var(--accent);">hexforgestuidogames@gmail.com</a></p>
+          <div class="social" style="margin-top: 14px;">
+            
+            <a class="link" href="https://github.com/HexForgeStudio" target="_blank" rel="noopener" data-i18n="social_github">GitHub</a>
+            <a class="link" href="https://www.linkedin.com/company/hexforge/" target="_blank" rel="noopener" data-i18n="social_linkedin">LinkedIn</a>
+            <a class="link" href="https://kwork.ru/user/hexforgestuidogames" target="_blank" rel="noopener" data-i18n="social_upwork">Kwork</a>
+          </div>
+        </div>
+
+        <div class="card two">
+          <strong style="display:block; font-size: 16px; margin-bottom: 8px;" data-i18n="contacts_request">Заявка</strong>
+          <p style="color: var(--muted); font-size: 14px;" data-i18n="contacts_request_sub">
+            Пока без backend и CMS. Можно нажать кнопки ниже и отправить письмо или написать в Telegram.
+          </p>
+          <div class="hero-actions" style="margin-top: 14px;">
+            <a class="btn primary" href="mailto:hexforgestuidogames@gmail.com?subject=HexForge%20Inquiry" data-i18n="btn_mail">Написать на почту</a>
+            <a class="btn" href="https://t.me/inzavic" target="_blank" rel="noopener" data-i18n="btn_tg2">Написать в Telegram</a>
+          </div>
+          <p style="margin-top: 12px; color: var(--muted2); font-size: 12px;" data-i18n="contacts_note">
+            NDA и детали проекта обсуждаем до старта работ.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <div class="brand" style="gap:10px; margin-bottom: 10px;">
+        <span class="logo" aria-hidden="true">
+  <img src="hexforge-icon.png" alt="HexForge logo" style="width:34px;height:34px;display:block;" />
+</span>
+        <span>
+          HexForge
+          
+        </span>
+      </div>
+      <div style="color: var(--muted2); font-size: 13px;" data-i18n="footer_note">Портфолио и визитка. Цены и сроки по запросу.</div>
+      <div style="margin-top: 10px; color: var(--muted2); font-size: 12px;">© <span id="year"></span> HexForge</div>
+    </div>
+    <div>
+      <div class="social">
+        <a class="link" href="https://t.me/inzavic" target="_blank" rel="noopener">Telegram</a>
+        <a class="link" href="mailto:hexforgestuidogames@gmail.com">Email</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const I18N = {
+    ru: {
+      nav_services: "Услуги",
+      nav_cases: "Кейсы",
+      nav_process: "Процесс",
+      nav_team: "Команда",
+      nav_reviews: "Отзывы",
+      nav_careers: "Вакансии",
+      nav_blog: "Блог",
+      nav_contacts: "Контакты",
+      cta_header: "Связаться",
+      badge: "Full-cycle, outsourcing, live ops",
+      hero_title: "Создаём игры, VR/AR и симуляторы. Быстро. Качественно. Под NDA.",
+      hero_sub: "HexForge — команда, которая берёт на себя полный цикл или подключается точечно: геймплей, системы, оптимизация, сборки, поддержка, ассеты. Unity/Unreal, 2D/3D, мобильные и ПК.",
+      btn_cases: "Смотреть кейсы",
+      btn_tg: "Написать в Telegram",
+      btn_contact: "Оставить заявку",
+      stat_stack: "Основной стек",
+      stat_downloads: "скачиваний за месяц",
+      pill_1: "Оптимизация, профайлинг, снижение нагрузки CPU/GPU",
+      pill_2: "Интеграции: аналитика, платежи, контент, live ops",
+      pill_3: "Готовы работать по NDA и под ваш пайплайн",
+      services_title: "Услуги",
+      services_sub: "Подключаемся на весь цикл или закрываем конкретные задачи разработки и поддержки.",
+      s1_title: "GameDev 2D / 3D",
+      s1_desc: "Геймплей, системы, UI, сборки, релиз. Unity и Unreal Engine.",
+      s2_title: "VR / AR",
+      s2_desc: "Интерактивные решения для обучения, презентаций и опыта пользователя.",
+      s3_title: "Тренажёры и симуляторы",
+      s3_desc: "Сценарии, механики, аналитика прогресса, интеграции под бизнес-задачу.",
+      s4_title: "Ассеты и asset packs",
+      s4_desc: "Создание и подготовка ассетов для магазинов и внутренних проектов.",
+      s5_title: "Оптимизация и портирование",
+      s5_desc: "FPS, память, загрузки, профайлинг, стабильность на целевых устройствах.",
+      s6_title: "Support & Live Ops",
+      s6_desc: "Поддержка после релиза, обновления, события, исправления, контент.",
+      cases_title: "Кейсы",
+      cases_sub: "Добавили 2 кейса. Формат готов, чтобы быстро расширять портфолио.",
+      case1_desc: "Детская мобильная игра с узбекскими культурными ценностями. Полный цикл: разработка, оптимизация, публикация.",
+      case1_result_title: "Результат",
+      case1_result: "50 000+ скачиваний за первый месяц",
+      chip_fullcycle: "Full-cycle",
+      chip_mobile: "Mobile",
+      chip_unity: "Unity",
+      chip_opt: "Optimization",
+      chip_ar: "AR",
+      chip_museum: "Museum",
+      case2_desc: "AR-игра для локального музея: мы анимировали картины, сделали их «живыми» с помощью звука и визуальных эффектов, добавили интерактивный маршрут и элементы геймификации прямо в экспозиции.",
+      case2_result_title: "Результат",
+      case2_result: "Продажи билетов выросли на 30% за счёт привлечения посетителей.",
+      case2_links: "Ссылки по запросу (NDA)",
+      case_btn: "Хочу такой проект",
+      process_title: "Процесс работы",
+      process_sub: "Прозрачный процесс, чтобы вы понимали сроки, риски и контроль качества.",
+      p1_t: "1. Анализ",
+      p1_d: "Цели, платформа, ограничения, критерии успеха.",
+      p2_t: "2. План",
+      p2_d: "Оценка, этапы, риски, план релизов.",
+      p3_t: "3. Разработка",
+      p3_d: "Итерации, отчётность, демо-сборки.",
+      p4_t: "4. QA",
+      p4_d: "Тесты, оптимизация, стабилизация.",
+      p5_t: "5. Релиз",
+      p5_d: "Подготовка магазинов, публикация, поддержка.",
+      p6_t: "6. Live Ops",
+      p6_d: "События, обновления, аналитика, улучшения.",
+      team_title: "Команда",
+      team_sub: "Небольшая, собранная команда. Быстро принимаем решения и держим качество.",
+      team_block1_t: "Как мы работаем",
+      team_block1_d: "Работаем по NDA, легко встраиваемся в пайплайн заказчика и общаемся на языке продакшена: сроки, риски, качество.",
+      team_block2_t: "Экспертиза",
+      team_block2_d: "Unity/UE, оптимизация, сборки, интеграции, поддержка и развитие проектов после релиза.",
+      reviews_title: "Отзывы",
+      reviews_sub: "Секция подготовлена. Можно добавить отзывы клиентов или ссылки на профили.",
+      reviews_placeholder: "Добавим отзывы после согласования формата.",
+      reviews_placeholder2: "Можно вставить скриншоты/цитаты, не раскрывая NDA.",
+      careers_title: "Вакансии",
+      careers_sub: "Если сейчас нет открытых ролей, оставим короткий блок с формой контакта.",
+      careers_placeholder: "Сейчас вакансии открываем по мере проектов. Если хотите сотрудничать или прислать портфолио, напишите нам.",
+      blog_title: "Блог",
+      blog_sub: "Секция под будущие статьи: разборы, оптимизация, подходы к разработке.",
+      blog_placeholder: "Здесь будут статьи и новости. Пока можно оставить пустым или скрыть.",
+      contacts_title: "Контакты",
+      contacts_sub: "Свяжитесь с нами удобным способом. Цены и сроки согласуем после вводных.",
+      contacts_fast: "Быстрый контакт",
+      contacts_request: "Заявка",
+      contacts_request_sub: "Пока без backend и CMS. Можно нажать кнопки ниже и отправить письмо или написать в Telegram.",
+      btn_mail: "Написать на почту",
+      btn_tg2: "Написать в Telegram",
+      
+      social_github: "GitHub",
+      social_linkedin: "LinkedIn",
+      social_upwork: "Kwork",
+      contacts_note: "NDA и детали проекта обсуждаем до старта работ.",
+      footer_note: "Портфолио и визитка. Цены и сроки по запросу."
+    },
+    en: {
+      nav_services: "Services",
+      nav_cases: "Cases",
+      nav_process: "Process",
+      nav_team: "Team",
+      nav_reviews: "Reviews",
+      nav_careers: "Careers",
+      nav_blog: "Blog",
+      nav_contacts: "Contacts",
+      cta_header: "Contact",
+      badge: "Full-cycle, outsourcing, live ops",
+      hero_title: "We build games, VR/AR, and simulators. Fast. Clean. Under NDA.",
+      hero_sub: "HexForge is a team that delivers full-cycle or plugs into specific areas: gameplay, systems, optimization, builds, support, and assets. Unity/Unreal, 2D/3D, mobile and PC.",
+      btn_cases: "View cases",
+      btn_tg: "Message on Telegram",
+      btn_contact: "Leave a request",
+      stat_stack: "Core stack",
+      stat_downloads: "downloads per month",
+      pill_1: "Optimization, profiling, CPU/GPU performance",
+      pill_2: "Integrations: analytics, payments, content, live ops",
+      pill_3: "Ready to work under NDA and your pipeline",
+      services_title: "Services",
+      services_sub: "Full-cycle delivery or targeted help for development and support.",
+      s1_title: "2D / 3D Game Development",
+      s1_desc: "Gameplay, systems, UI, builds, release. Unity and Unreal Engine.",
+      s2_title: "VR / AR",
+      s2_desc: "Interactive experiences for education, exhibitions, and engagement.",
+      s3_title: "Trainers & Simulators",
+      s3_desc: "Scenarios, mechanics, progress analytics, business integrations.",
+      s4_title: "Assets & Packs",
+      s4_desc: "Creation and preparation of assets for stores and internal projects.",
+      s5_title: "Optimization & Porting",
+      s5_desc: "FPS, memory, loading times, profiling, stability on target devices.",
+      s6_title: "Support & Live Ops",
+      s6_desc: "Post-release support, updates, events, fixes, and content.",
+      cases_title: "Cases",
+      cases_sub: "2 cases included. The layout is ready to scale.",
+      case1_desc: "A kids mobile game with Uzbek cultural values. Full-cycle: development, optimization, publishing.",
+      case1_result_title: "Result",
+      case1_result: "50,000+ downloads in the first month",
+      chip_fullcycle: "Full-cycle",
+      chip_mobile: "Mobile",
+      chip_unity: "Unity",
+      chip_opt: "Optimization",
+      chip_ar: "AR",
+      chip_museum: "Museum",
+      case2_desc: "An AR museum game where we animated paintings and made them feel alive using sound and visual effects, combined with an interactive route and gamification inside the exhibition.",
+      case2_result_title: "Result",
+      case2_result: "Ticket sales increased by 30% due to higher visitor engagement.",
+      case2_links: "Links on request (NDA)",
+      case_btn: "I want a project like this",
+      process_title: "Process",
+      process_sub: "Transparent steps so you can track timelines, risks, and quality.",
+      p1_t: "1. Discovery",
+      p1_d: "Goals, platform, constraints, success metrics.",
+      p2_t: "2. Planning",
+      p2_d: "Estimates, milestones, risks, release plan.",
+      p3_t: "3. Development",
+      p3_d: "Iterations, reporting, demo builds.",
+      p4_t: "4. QA",
+      p4_d: "Testing, optimization, stabilization.",
+      p5_t: "5. Release",
+      p5_d: "Store preparation, publishing, support.",
+      p6_t: "6. Live Ops",
+      p6_d: "Events, updates, analytics, improvements.",
+      team_title: "Team",
+      team_sub: "A compact, focused team. Fast decisions, strong quality bar.",
+      team_block1_t: "How we work",
+      team_block1_d: "We work under NDA, integrate into your pipeline, and communicate in production terms: scope, risks, quality.",
+      team_block2_t: "Expertise",
+      team_block2_d: "Unity/UE, optimization, builds, integrations, and post-release support.",
+      reviews_title: "Reviews",
+      reviews_sub: "Section is ready. We can add client feedback or profile links.",
+      reviews_placeholder: "We’ll add reviews after agreeing on the format.",
+      reviews_placeholder2: "Quotes/screenshots can be added without breaking NDA.",
+      careers_title: "Careers",
+      careers_sub: "If there are no open roles, we keep a short contact block.",
+      careers_placeholder: "Open roles depend on projects. If you want to collaborate or send a portfolio, contact us.",
+      blog_title: "Blog",
+      blog_sub: "Future posts: breakdowns, optimization, development approaches.",
+      blog_placeholder: "Articles and updates will appear here.",
+      contacts_title: "Contacts",
+      contacts_sub: "Reach us the way you prefer. Pricing and timeline on request.",
+      contacts_fast: "Quick contact",
+      contacts_request: "Request",
+      contacts_request_sub: "No backend or CMS yet. Use email or Telegram to reach us.",
+      btn_mail: "Email us",
+      btn_tg2: "Message on Telegram",
+      
+      social_github: "GitHub",
+      social_linkedin: "LinkedIn",
+      social_upwork: "Kwork",
+      contacts_note: "NDA and project details are discussed before kickoff.",
+      footer_note: "Portfolio & studio card. Pricing and timeline on request."
+    },
+    uz: {
+      nav_services: "Xizmatlar",
+      nav_cases: "Keyslar",
+      nav_process: "Jarayon",
+      nav_team: "Jamoa",
+      nav_reviews: "Sharhlar",
+      nav_careers: "Vakansiyalar",
+      nav_blog: "Blog",
+      nav_contacts: "Aloqa",
+      cta_header: "Bog'lanish",
+      badge: "Full-cycle, outsourcing, live ops",
+      hero_title: "O'yinlar, VR/AR va simulyatorlar yaratamiz. Tez. Sifatli. NDA bilan.",
+      hero_sub: "HexForge to'liq siklni bajaradi yoki alohida yo'nalishlarga ulanadi: gameplay, tizimlar, optimizatsiya, buildlar, qo'llab-quvvatlash va assetlar. Unity/Unreal, 2D/3D, mobil va PC.",
+      btn_cases: "Keyslarni ko'rish",
+      btn_tg: "Telegramda yozish",
+      btn_contact: "So'rov qoldirish",
+      stat_stack: "Asosiy stack",
+      stat_downloads: "1 oyda yuklab olish",
+      pill_1: "Optimizatsiya, profiling, CPU/GPU samaradorlik",
+      pill_2: "Integratsiyalar: analytics, to'lovlar, kontent, live ops",
+      pill_3: "NDA va sizning pipeline bo'yicha ishlaymiz",
+      services_title: "Xizmatlar",
+      services_sub: "To'liq sikl yoki aniq vazifalar bo'yicha yordam.",
+      s1_title: "2D / 3D GameDev",
+      s1_desc: "Gameplay, tizimlar, UI, build, reliz. Unity va Unreal Engine.",
+      s2_title: "VR / AR",
+      s2_desc: "Ta'lim va ko'rgazmalar uchun interaktiv AR/VR tajribalar.",
+      s3_title: "Trenajorlar va simulyatorlar",
+      s3_desc: "Ssenariy, mexanika, progress analytics, integratsiyalar.",
+      s4_title: "Assetlar va paketlar",
+      s4_desc: "Store va ichki loyihalar uchun asset tayyorlash.",
+      s5_title: "Optimizatsiya & port",
+      s5_desc: "FPS, xotira, yuklanishlar, profiling, stabil ishlash.",
+      s6_title: "Support & Live Ops",
+      s6_desc: "Relizdan keyin qo'llab-quvvatlash, update, event, fix, kontent.",
+      cases_title: "Keyslar",
+      cases_sub: "2 ta keys qo'shildi. Portfelni kengaytirish uchun format tayyor.",
+      case1_desc: "Bolalar uchun mobil o'yin, o'zbek madaniy qadriyatlari bilan. To'liq sikl: ishlab chiqish, optimizatsiya, nashr.",
+      case1_result_title: "Natija",
+      case1_result: "Birinchi oyda 50 000+ yuklab olish",
+      chip_fullcycle: "Full-cycle",
+      chip_mobile: "Mobile",
+      chip_unity: "Unity",
+      chip_opt: "Optimization",
+      chip_ar: "AR",
+      chip_museum: "Museum",
+      case2_desc: "Mahalliy muzey uchun AR o'yin: rasmlar animatsiya qilindi, ovoz va vizual effektlar yordamida jonlantirildi, interaktiv marshrut va gamifikatsiya qo'shildi.",
+      case2_result_title: "Natija",
+      case2_result: "Tashrif buyuruvchilar jalbi hisobiga bilet savdosi 30% ga oshdi.",
+      case2_links: "Havolalar so'rov bo'yicha (NDA)",
+      case_btn: "Shunday loyiha kerak",
+      process_title: "Jarayon",
+      process_sub: "Timeline, risk va sifat nazorati aniq bo'ladi.",
+      p1_t: "1. Tahlil",
+      p1_d: "Maqsadlar, platforma, cheklovlar, KPI.",
+      p2_t: "2. Reja",
+      p2_d: "Baholash, bosqichlar, risk, reliz rejasi.",
+      p3_t: "3. Ishlab chiqish",
+      p3_d: "Iteratsiyalar, hisobot, demo buildlar.",
+      p4_t: "4. QA",
+      p4_d: "Test, optimizatsiya, stabilizatsiya.",
+      p5_t: "5. Reliz",
+      p5_d: "Store tayyorlash, nashr, support.",
+      p6_t: "6. Live Ops",
+      p6_d: "Event, update, analytics, yaxshilash.",
+      team_title: "Jamoa",
+      team_sub: "Kichik, lekin kuchli jamoa. Tez qaror va sifat.",
+      team_block1_t: "Qanday ishlaymiz",
+      team_block1_d: "NDA bilan ishlaymiz, sizning pipeline'ga moslashamiz va scope/risk/sifat bo'yicha gaplashamiz.",
+      team_block2_t: "Ekspertiza",
+      team_block2_d: "Unity/UE, optimizatsiya, buildlar, integratsiyalar, relizdan keyin support.",
+      reviews_title: "Sharhlar",
+      reviews_sub: "Bo'lim tayyor. Mijoz fikrlari yoki profil linklarini qo'shamiz.",
+      reviews_placeholder: "Formatni kelishib olgandan keyin sharhlarni qo'shamiz.",
+      reviews_placeholder2: "NDA buzmasdan iqtibos/screenshot qo'shish mumkin.",
+      careers_title: "Vakansiyalar",
+      careers_sub: "Agar hozir rol yo'q bo'lsa, qisqa aloqa bloki qoldiramiz.",
+      careers_placeholder: "Rol va ehtiyojlar loyihaga bog'liq. Hamkorlik yoki portfel yuborish uchun yozing.",
+      blog_title: "Blog",
+      blog_sub: "Kelajakdagi postlar: breakdown, optimizatsiya, yondashuvlar.",
+      blog_placeholder: "Maqolalar va yangiliklar shu yerda bo'ladi.",
+      contacts_title: "Aloqa",
+      contacts_sub: "Qulay usulda bog'laning. Narx va muddat so'rov bo'yicha.",
+      contacts_fast: "Tez aloqa",
+      contacts_request: "So'rov",
+      contacts_request_sub: "Hozircha backend/CMS yo'q. Email yoki Telegram orqali yozing.",
+      btn_mail: "Email yozish",
+      btn_tg2: "Telegramda yozish",
+      
+      social_github: "GitHub",
+      social_linkedin: "LinkedIn",
+      social_upwork: "Kwork",
+      contacts_note: "NDA va detallar startdan oldin kelishiladi.",
+      footer_note: "Portfel va vizitka. Narx va muddat so'rov bo'yicha."
+    }
+  };
+
+  function applyLang(lang) {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const val = I18N?.[lang]?.[key];
+      if (typeof val === 'string') el.textContent = val;
+    });
+
+    document.querySelectorAll('.lang button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+
+    try { localStorage.setItem('hexforge_lang', lang); } catch (e) {}
+  }
+
+  document.querySelectorAll('.lang button').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+
+  const saved = (() => { try { return localStorage.getItem('hexforge_lang'); } catch (e) { return null; } })();
+  applyLang(saved || 'ru');
+
+  document.getElementById('year').textContent = String(new Date().getFullYear());
+</script>
+</body>
+</html>
